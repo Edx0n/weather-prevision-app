@@ -2,7 +2,8 @@
 
 import { motion } from "framer-motion";
 import type { ForecastData, TemperatureUnit } from "@/types/weather";
-import { formatDate, formatTemperature, getWeatherEmoji } from "@/utils/weatherUtils";
+import { formatDate, formatTemperature } from "@/utils/weatherUtils";
+import { getWeatherIcon, getWeatherIconColor } from "@/utils/weatherIcons";
 
 interface ForecastCardProps {
   forecast: ForecastData;
@@ -24,24 +25,31 @@ export const ForecastCard = ({ forecast, unit }: ForecastCardProps): JSX.Element
     >
       <h3 className="text-2xl font-bold text-white mb-4 text-center">5-Day Forecast</h3>
       <div className="grid grid-cols-5 gap-3">
-        {dailyForecasts.map((day, index) => (
-          <motion.div
-            key={day.dt}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.1 }}
-            className="bg-white/10 backdrop-blur-lg rounded-2xl p-4 border border-white/20 text-center"
-          >
-            <p className="text-white/80 text-sm mb-2">{formatDate(day.dt)}</p>
-            <div className="text-4xl mb-2">{getWeatherEmoji(day.weather[0].main)}</div>
-            <p className="text-white text-lg font-semibold">
-              {formatTemperature(day.main.temp, unit)}
-            </p>
-            <p className="text-white/60 text-xs mt-1 capitalize">
-              {day.weather[0].description}
-            </p>
-          </motion.div>
-        ))}
+        {dailyForecasts.map((day, index) => {
+          const WeatherIcon = getWeatherIcon(day.weather[0].main);
+          const iconColor = getWeatherIconColor(day.weather[0].main);
+          
+          return (
+            <motion.div
+              key={day.dt}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
+              className="bg-white/10 backdrop-blur-lg rounded-2xl p-4 border border-white/20 text-center hover:bg-white/15 hover:scale-105 transition-all cursor-pointer"
+            >
+              <p className="text-white/80 text-sm mb-2 font-medium">{formatDate(day.dt)}</p>
+              <div className="flex justify-center mb-2">
+                <WeatherIcon className={`w-12 h-12 ${iconColor}`} />
+              </div>
+              <p className="text-white text-lg font-semibold mb-1">
+                {formatTemperature(day.main.temp, unit)}
+              </p>
+              <p className="text-white/60 text-xs capitalize leading-tight">
+                {day.weather[0].description}
+              </p>
+            </motion.div>
+          );
+        })}
       </div>
     </motion.div>
   );
